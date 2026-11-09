@@ -1,0 +1,80 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "main",
+  "maxCacheSize": "10GB",
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)",
+      "!{projectRoot}/**/__tests__/**/*",
+      "!{projectRoot}/vitest.config.[jt]s",
+      "!{projectRoot}/playwright.config.[jt]s",
+      "!{projectRoot}/tests/**/*"
+    ],
+    "sharedGlobals": [
+      "{workspaceRoot}/nx.json",
+      "{workspaceRoot}/package.json",
+      "{workspaceRoot}/eslint.config.mjs"
+    ],
+    "sharedMigrations": [
+      "{workspaceRoot}/drizzle/{00[0-9][0-9],01[0-2][0-9],013[0-3]}_*.sql",
+      "{workspaceRoot}/drizzle/[0-9][0-9][0-9][0-9]_shared__*.sql"
+    ],
+    "migrations": []
+  },
+  "targetDefaults": {
+    "build": {
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ]
+    },
+    "test": {
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "default",
+        "^production",
+        "sharedMigrations",
+        "^migrations"
+      ],
+      "metadata": {
+        "description": "Every test target that boots the PGLite test DB materializes its schema by executing drizzle/*.sql (see packages/db-runtime/src/test-client-pglite.ts), so migrations are a real input to those runs; without them a migration edit does not invalidate the cache and the suites replay a stale pass (proven live: editing 0108's predicate left its own migration test green). Ownership narrows the input: sharedMigrations is the frozen legacy range 0000-0133 plus every NNNN_shared__*.sql (a new shared migration reruns every DB-backed suite), and ^migrations is the named input each db-schema-<domain> project defines for its own NNNN_<domain>__*.sql, so a test only rereads the migrations of the slices it depends on. db-schema-all, the schema layer, lists the whole drizzle/ folder and validates the chain once. See docs/architecture/engineering-invariants.md 2.4."
+      }
+    },
+    "lint": {
+      "cache": true,
+      "inputs": [
+        "default"
+      ]
+    },
+    "typecheck": {
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production"
+      ]
+    },
+    "e2e": {
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "default",
+        "^production"
+      ]
+    }
+  },
+  "analytics": false
+}

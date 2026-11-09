@@ -1,0 +1,63 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "store-exporter",
+  "projectType": "application",
+  "sourceRoot": "extensions/store-exporter/src",
+  "tags": ["type:app", "scope:store-exporter"],
+  "targets": {
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit --project tsconfig.json",
+        "cwd": "extensions/store-exporter"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "metadata": {
+        "description": "steam-preferences Story 2.1 (AC6): esbuild-driven MV3 bundle build, run with tsx (repo script convention). Emits BOTH browser bundles — dist/extensions/store-exporter/{chrome,firefox}/ — from build.ts, which resolves @subtails/contracts/discovery through an explicit alias and bundles zod in. Output goes to the workspace-root dist/, mirroring the packages/* precedent so the existing eslint dist/** ignore and .gitignore already cover it."
+      },
+      "options": {
+        "command": "npx tsx build.ts",
+        "cwd": "extensions/store-exporter"
+      },
+      "outputs": ["{workspaceRoot}/dist/extensions/store-exporter"]
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node ../../node_modules/eslint/bin/eslint.js .",
+        "cwd": "extensions/store-exporter"
+      }
+    },
+    "package": {
+      "executor": "nx:run-commands",
+      "metadata": {
+        "description": "steam-preferences Story 2.3 (AC1): builds both browser bundles in-process, validates the emitted manifest bytes, then zips a Chrome ZIP, a Firefox XPI, and a reproducible source archive to dist/extensions/store-exporter/release/, alongside SHA256SUMS.txt and submission.json. Deterministic — two runs over the same source are byte-identical. Runs under the CI gate; never signs or uploads anything. NOT CACHED (2026-09-04 review finding P0-7): submission.json.generatedFrom records `git rev-parse HEAD` — a value no file-content input can express, since two different commits can share an identical file tree for this target's inputs. A content-hash cache would then replay an old run's artifact (and its now-stale generatedFrom) on a new commit, which is a release artifact making a false provenance claim. `production`/`^production` inputs were also independently stale either way — they exclude every `*.test.ts`/vitest.config.ts the source archive embeds and never included package-lock.json (see nx.json's own `test` target metadata for this same missing-inputs class) — but the git-HEAD problem survives even a fully-correct inputs list, so `cache: false` is the honest fix rather than a wider inputs array."
+      },
+      "options": {
+        "command": "npx tsx package.ts",
+        "cwd": "extensions/store-exporter"
+      },
+      "cache": false,
+      "outputs": ["{workspaceRoot}/dist/extensions/store-exporter/release"]
+    },
+    "submit": {
+      "executor": "nx:run-commands",
+      "metadata": {
+        "description": "steam-preferences Story 2.3 (AC2). OPERATOR-ONLY — never part of `package`, never wired into CI, never run by the gate. Uploads the packaged artifact to the requested store (`npx tsx submit.ts <chrome|firefox>` from this directory) only once every required credential env var is present; fails loudly and performs no network call otherwise. See README.md."
+      },
+      "options": {
+        "command": "npx tsx submit.ts",
+        "cwd": "extensions/store-exporter"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run --passWithNoTests",
+        "cwd": "extensions/store-exporter"
+      }
+    }
+  }
+}

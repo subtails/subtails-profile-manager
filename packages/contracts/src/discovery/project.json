@@ -1,0 +1,36 @@
+{
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "name": "contracts-discovery",
+  "sourceRoot": "packages/contracts/src/discovery",
+  "projectType": "library",
+  "tags": [
+    "type:platform",
+    "scope:shared"
+  ],
+  "targets": {
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit --project tsconfig.json",
+        "cwd": "packages/contracts/src/discovery"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p tsconfig.json --outDir ../../../../dist/contracts-discovery",
+        "cwd": "packages/contracts/src/discovery"
+      },
+      "outputs": [
+        "{workspaceRoot}/dist/contracts-discovery"
+      ]
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node ../../../../node_modules/eslint/bin/eslint.js .",
+        "cwd": "packages/contracts/src/discovery"
+      }
+    }
+  }
+}

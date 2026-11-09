@@ -1,0 +1,39 @@
+{
+  // extensions/store-exporter — steam-preferences Story 2.1 (AC1, AC6).
+  //
+  // Typechecked by ITS OWN target against its own ambient WebExtension declarations
+  // (src/types/webextension.d.ts), never against the root tsconfig.json — the root config has no
+  // `chrome`/`browser` globals and its `exclude` array names this directory (AC1) precisely so this
+  // project's `nx typecheck store-exporter` is the only thing that ever typechecks it.
+  //
+  // No `@subtails/store-exporter` path alias exists anywhere (a deliberate absence, AC1) — this
+  // config's own `paths` carries only the one inbound edge this project is allowed: contracts.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["es2022", "dom"],
+    "allowJs": false,
+    "strict": true,
+    "noImplicitAny": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    // `@types/node` (already a devDependency, used everywhere — no new dependency) is needed for
+    // `build.ts` and this project's own `*.test.ts` files, which run under `tsx`/`vitest` in Node,
+    // not in a browser. Combined with `lib: ["es2022","dom"]` exactly as the ROOT `tsconfig.json`
+    // already does (dom + node together, without conflict, at this repo's pinned @types/node
+    // version) — the runtime source (`background.ts`, `adapters/**`, `manifest.config.ts`, …) simply
+    // never calls a Node API, so the extra globals are unused there, never a hazard.
+    "types": ["node"],
+    "paths": {
+      "@subtails/contracts/discovery": ["../../packages/contracts/src/discovery/index.ts"]
+    },
+    "ignoreDeprecations": "6.0"
+  },
+  "include": ["src/**/*.ts", "build.ts", "package.ts", "submit.ts", "*.test.ts"],
+  "exclude": ["node_modules", "dist"]
+}
