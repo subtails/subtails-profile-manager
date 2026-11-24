@@ -25,6 +25,9 @@ describe('extension source mirror', () => {
 		expect(workflow).toContain('MIRROR_REPO: subtails/subtails-profile-manager');
 		expect(workflow).toContain('git ls-remote --exit-code --tags');
 		expect(workflow).toContain('-source.zip');
+		// A short-lived GitHub App token, never a static key.
+		expect(workflow).toContain('uses: actions/create-github-app-token@');
+		expect(workflow).not.toMatch(/DEPLOY_KEY|ssh-keyscan|git@github\.com/);
 	});
 
 	it('the source archive gives the public repository its README', () => {

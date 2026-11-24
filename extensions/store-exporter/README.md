@@ -61,8 +61,9 @@ decision, 2026-11-01), and the store listings link to it (`STORE-LISTING.md`). E
 `EXTENSION_VERSION` on `main` is copied there by `.github/workflows/extension-source-mirror.yml`: it
 packages the release, unzips the source archive as one commit and tags it `v<version>`. A change
 without a version bump copies nothing. Its front page is `PUBLIC-README.md`, shipped in the source
-archive as `README.md`. The workflow pushes with the deploy key in the Actions secret
-`EXTENSION_MIRROR_DEPLOY_KEY`.
+archive as `README.md`. The workflow pushes with a one-hour token of the GitHub App
+"subtails release" (Contents write on that one repository; app id in the Actions variable
+`EXTENSION_MIRROR_APP_ID`, private key in the secret `EXTENSION_MIRROR_APP_PRIVATE_KEY`).
 
 ## Build, package, submit
 

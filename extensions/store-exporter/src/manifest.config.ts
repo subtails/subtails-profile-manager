@@ -37,12 +37,13 @@ export const EXTENSION_DESCRIPTION =
  * derive from this single constant — never a second version literal anywhere in this project
  * (`store-exporter-version-single-source.guard.test.ts` enforces it mechanically).
  *
- * `1.2.0` adds the Epic order history reader and the daily refresh. Story 2.3 owns real releases: this
+ * `1.2.1` carries the Epic order history reader, the daily refresh and current dependency security
+ * fixes. Story 2.3 owns real releases: this
  * is bumped forward on every release thereafter — both
  * stores reject a re-used or lower version number, which is a store-enforced fact this project does
  * not duplicate with a local version-history file (see the README's release steps).
  */
-export const EXTENSION_VERSION = '1.2.0';
+export const EXTENSION_VERSION = '1.2.1';
 
 /**
  * The Firefox add-on's Gecko identity — fixed across every release (an AMO requirement: the id is how
